@@ -13,9 +13,10 @@ fn main() {
     let mut d: usize = 0;
 
     let mut grid = get_input("input");
-    let mut obstructions = vec![vec![false; grid[0].len()]; grid.len()];
     let agent_pos = find_agent(&grid);
     let mut pos = agent_pos;
+
+    let mut result = 0;
 
     loop {
 
@@ -26,18 +27,18 @@ fn main() {
             break;
         }
 
-        set_cell(&mut grid, &next_pos, '#');
-        if is_loop(&grid, agent_pos.clone(), 0) {
-            obstructions[next_pos.y as usize][next_pos.x as usize] = true;
+        if get_cell(&grid, &next_pos) != 'X' {
+            set_cell(&mut grid, &next_pos, '#');
+            if is_loop(&grid, pos.clone(), next(d)) {
+                result += 1;
+            }
+            set_cell(&mut grid, &next_pos, 'X');
         }
-        set_cell(&mut grid, &next_pos, '.');
 
         d = next_d;
         pos = next_pos;
     }
 
-    obstructions[agent_pos.y as usize][agent_pos.x as usize] = false;
-    let result = count(&obstructions);
     println!("{}", result)
 }
 
@@ -60,19 +61,6 @@ fn is_loop(grid: &Vec<Vec<char>>, mut pos: Pos, mut d: usize) -> bool {
         pos = step(&grid, &pos, &mut d);
     }
 }
-
-fn count(obstructions: &Vec<Vec<bool>>) -> i16 {
-    let mut result = 0;
-    for y in 0..obstructions.len() {
-        for x in 0..obstructions[0].len() {
-            if obstructions[y][x] {
-                result += 1;
-            }
-        }
-    }
-    result
-}
-
 
 // ------------------------- Grid-related ----------------------------
 
